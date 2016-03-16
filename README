@@ -1,0 +1,32 @@
+Qing Huang
+CSE123 PA2
+2015/6/5
+
+For this router project, I only modified two files, sr_router.c and sr_arpcache.c, plus their header files.
+
+1) sr_router.c
+  In this part, my main idea is come from the discussion slide the flow chart image. 
+  1. Determined what is the type of the incoming packet, ARP or IP
+  2. then, I create two functions to handle ARP/IP packets separately.
+  3. In handle ARP function, I need to figure which type of ARP, request or reply
+  4. Then I build another two function to handle arp request and arp reply
+  5. for arp request, I just create a new packet and rotate the dst/src addr to send replay back
+  6. for arp reply, insert IP/MAC mapping first, then release packet that waiting on this replay
+  7. For ip packet, we need to determined which dst is this packet.
+  8. if it is for me, find it is ICMP or TCP/UDP.
+  9. if it ICMP request, just send ICMP reply back.
+  10. if it is TCP/UDP, send the corresponding error massage
+  11. if it is not for me, decrement TTL, and check the routing table to find which interface
+      could be used to forward to the final dest.
+  12. if not match anything in the routing table, send error massage.
+  13. if it match in rtable, check ARP cache to see if we have dest's MAC address.
+  14. if we have it, forwarding the frame to the nexthop.
+  15. if we dont have it, queue the packet, send the boradcase ARP request to find dest's MAC addr.
+  16. however, if we send over 5 times and still didn't get replay, send error massage.
+
+2) sr_arpcache.c
+  in this part, my main idea is come from the brief code in the arpcache.h file.
+  the previous step 16 is actully finish in this file, also function sweepreqs was call every seconds,
+  to keep track the sent times of each request that waiting on the reply.
+
+Don't have enough time... hope I could write more :(
